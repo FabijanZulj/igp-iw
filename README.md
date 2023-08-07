@@ -8,6 +8,13 @@ docker-compose up -d
 ```
 
 This builds the API service, the notifications service and runs Postgres and Kafka.
+To be able to send emails edit docker-compose and set these environment variables with eg. Mailtrap plain credentials
+```
+SMTP_HOST: enterHost
+SMTP_PORT: 587
+SMTP_USERNAME: smtppw
+SMTP_PASSWORD: smtpu
+```
 
 ## API
 API service provides the following endpoints:
