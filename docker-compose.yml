@@ -1,0 +1,51 @@
+version: '2'
+services:
+  postgres:
+    image: postgres
+    container_name: igp-pg
+    environment:
+      POSTGRES_USER: fab
+      POSTGRES_PASSWORD: fab
+      POSTGRES_DB: igp
+  igp-api:
+    build: ./api/
+    environment:
+      KAFKA_TOPIC: notification_topic
+      DB_SOURCE: postgresql://fab:fab@igp-pg:5432/igp?sslmode=disable
+      JWT_SECRET: ChangeTheSuperSecret123
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - 3000:3000
+    depends_on:
+      - kafka
+      - postgres
+  notifications:
+    build: ./notifications/
+    environment:
+      KAFKA_TOPIC: notification_topic
+      KAFKA_BROKERS: kafka:9092
+      CONSUMER_GROUP: notification_consumer_group
+      SMTP_FROM: test@test.com
+      SMTP_HOST: enterHost-eg.mailtrap
+      SMTP_PORT: 587
+      SMTP_USERNAME: username
+      SMTP_PASSWORD: password
+    depends_on:
+      - kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+

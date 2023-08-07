@@ -1,0 +1,12 @@
+version: 2
+sql:
+  - engine: "postgresql"
+    schema: "migrations/"
+    queries: "query.sql"
+    gen:
+      go:
+        package: "database"
+        out: "database"
+        emit_interface: true
+        emit_methods_with_db_argument: true
+        emit_exported_queries: true
